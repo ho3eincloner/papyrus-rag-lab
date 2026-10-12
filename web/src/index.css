@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+  color: #f1ede7;
+  background: #0f0d09;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 14px;
+  --bg: #0f0d09;
+  --panel: #14110c;
+  --border: #332d23;
+  --muted: #8c8477;
+  --purple: #f7d18e;
+  --purple-bright: #f2bd60;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; min-width: 360px; background: var(--bg); }
+button, textarea { font: inherit; }
+button { color: inherit; }
+button:focus-visible, textarea:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; }
+::selection { background: #c49b54; color: white; }
+* { scrollbar-width: thin; scrollbar-color: #3f3728 transparent; }

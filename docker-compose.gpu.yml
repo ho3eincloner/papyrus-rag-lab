@@ -1,0 +1,17 @@
+# NVIDIA GPU override (needs the NVIDIA Container Toolkit, or Docker Desktop with WSL2 GPU support):
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up --build -d
+services:
+  llm:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    command: >
+      -m /models/${MODEL_FILE:?Set MODEL_FILE in .env (see .env.example)}
+      --host 0.0.0.0 --port 8080
+      -c ${LLM_CTX:-4096} --parallel ${LLM_PARALLEL:-1}
+      -ngl 99
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

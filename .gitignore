@@ -1,0 +1,25 @@
+# secrets / local config
+.env
+
+# private data: never commit documents, indexes or models
+data/documents/*
+data/index/*
+models/*
+!data/documents/.gitkeep
+!data/index/.gitkeep
+!models/.gitkeep
+!models/README.md
+*.pdf
+*.gguf
+*.npy
+*.jsonl
+
+# build artefacts
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+*.log
+*.backup*

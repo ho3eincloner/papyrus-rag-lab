@@ -1,0 +1,53 @@
+name: papyrus-rag-lab
+
+services:
+  # Local LLM: llama.cpp server (OpenAI-compatible API) serving a GGUF model from ./models
+  llm:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command: >
+      -m /models/${MODEL_FILE:?Set MODEL_FILE in .env (see .env.example)}
+      --host 0.0.0.0 --port 8080
+      -c ${LLM_CTX:-4096} --parallel ${LLM_PARALLEL:-1}
+    volumes:
+      - ./models:/models:ro
+    restart: unless-stopped
+
+  # RAG backend: FastAPI + sentence-transformers (embedding model baked into the image)
+  api:
+    build: ./api
+    image: papyrus-rag-lab-api
+    environment:
+      RAG_DATA_DIR: /data/index
+      LLM_BASE_URL: http://llm:8080
+      RAG_TOP_K: ${RAG_TOP_K:-5}
+      LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-500}
+      EMBEDDING_LOCAL_ONLY: "1"
+    volumes:
+      - ./data/index:/data/index:ro
+    depends_on:
+      - llm
+    restart: unless-stopped
+
+  # Web UI: React build served by nginx, /api proxied to the api service
+  web:
+    build: ./web
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # One-off job: builds the search index from ./data/documents
+  #   docker compose run --rm ingest
+  ingest:
+    build: ./api
+    image: papyrus-rag-lab-api
+    profiles: ["tools"]
+    user: root
+    command: python ingest.py
+    environment:
+      RAG_DOCS_DIR: /data/documents
+      RAG_DATA_DIR: /data/index
+      EMBEDDING_LOCAL_ONLY: "1"
+    volumes:
+      - ./data:/data
